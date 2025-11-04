@@ -2,7 +2,7 @@
   "type": "commonjs",
   "scripts": {
     "start": "http-server ./dist -op 5050",
-    "build": "npx webpack --config ./webpack.config.js",
+    "build": "npx webpack --config ./webpack.config.js --no-cache",
     "devW": "npx webpack --config ./webpack.config.js --watch"
   },
   "dependencies": {

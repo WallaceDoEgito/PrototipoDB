@@ -102,7 +102,7 @@ export default function UpdatePage() {
 
   async function handleQuerySubmit() {
     try {
-      const res = await fetch(`${process.env.DB_URL}/rawsql`, {
+      const res = await fetch("http://localhost:3333/rawsql", {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

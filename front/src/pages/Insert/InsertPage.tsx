@@ -228,7 +228,7 @@ export default function InsertPage() {
       setData(null);
       return;
     }
-    return fetch(`${process.env.DB_URL}/rawsql`, {
+    return fetch("http://localhost:3333/rawsql", {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -254,7 +254,7 @@ export default function InsertPage() {
       setData(null);
       return;
     }
-    return fetch(`${process.env.DB_URL}/rawsql`, {
+    return fetch("http://localhost:3333/rawsql", {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -277,7 +277,7 @@ export default function InsertPage() {
       setData(null);
       return;
     }
-    return fetch(`${process.env.DB_URL}/rawsql`, {
+    return fetch("http://localhost:3333/rawsql", {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
