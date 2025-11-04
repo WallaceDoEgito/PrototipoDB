@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { createSelectQuery } from '@utils/createSqlQuery';
+import { createDeleteQuery } from '@utils/createSqlQuery';
 import ResponseTable from '@components/ResponseTable/ResponseTable';
 import { TData, TTables } from '@types';
 
@@ -9,43 +9,33 @@ import Box from '@mui/material/Box';
 import Paper from '@mui/material/Paper';
 import TextField from '@mui/material/TextField';
 import InputLabel from '@mui/material/InputLabel';
-import Select, { SelectChangeEvent } from '@mui/material/Select';
+import Select from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
-import Checkbox from '@mui/material/Checkbox';
 import FormControl from '@mui/material/FormControl';
-import FormControlLabel from '@mui/material/FormControlLabel';
 import Alert from '@mui/material/Alert';
 import AlertTitle from '@mui/material/AlertTitle';
 
 import './style.scss';
 
-export default function SelectPage() {
-  const [select, setSelect] = useState('');
+export default function DeletePage() {
   const [table, setTable] = useState<TTables>('Produto');
-  const [tableAlias, setTableAlias] = useState('');
   const [where, setWhere] = useState('');
-  const [canJoin, setCanJoin] = useState(false);
-  const [joinAlias, setJoinAlias] = useState('');
 
   const [error, setError] = useState<string | null>(null);
   const [data, setData] = useState<TData | null>(null);
+  const [responseTable, setResponseTable] = useState<TTables>('Produto');
 
   return (
-    <Box className="select-page">
+    <Box className="delete-page">
       <Paper className='form'>
         <Box>
-          <Typography variant='body1'> SELECT: </Typography>
-          <TextField onBlur={(e) => setSelect(e.target.value.trim())} />
-        </Box>
-
-        <Box>
-          <Typography variant='body1'> FROM: </Typography>
+          <Typography variant='body1'> DELETE FROM: </Typography>
 
           <FormControl>
             <InputLabel> Tabela </InputLabel>
             <Select
               value={table}
-              onChange={handleTableChange}
+              onChange={(e) => setTable(e.target.value)}
               label='Tabela'
             >
               <MenuItem value='Produto'> Produto </MenuItem>
@@ -53,45 +43,7 @@ export default function SelectPage() {
               <MenuItem value='ProdutoDesconto'> ProdutoDesconto </MenuItem>
             </Select>
           </FormControl>
-
-          <Typography variant='body1'> AS: </Typography>
-          <TextField onBlur={(e) => setTableAlias(e.target.value.trim())} />
         </Box>
-
-        {
-          table !== 'ProdutoDesconto' && (
-            <Box>
-              <FormControlLabel
-                control={
-                  <Checkbox
-                    size='small'
-                    checked={canJoin}
-                    onChange={(e) => setCanJoin(e.target.checked)}
-                  />
-                }
-                label={
-                  <Typography
-                    variant='body1'
-                    color={canJoin ? 'textPrimary' : 'textDisabled'}
-                  >
-                    {`Join ${table === 'Produto' ? 'Desconto' : 'Produto'}`}
-                  </Typography>
-                }
-              />
-
-              <Typography
-                variant='body1'
-                color={canJoin ? 'textPrimary' : 'textDisabled'}
-              >
-                AS:
-              </Typography>
-              <TextField
-                onBlur={(e) => setJoinAlias(e.target.value.trim())}
-                disabled={!canJoin}
-              />
-            </Box>
-          )
-        }
 
         <Box>
           <Typography variant='body1'> WHERE: </Typography>
@@ -115,23 +67,23 @@ export default function SelectPage() {
           data && (
             data.length === 0 ? (
               <Alert variant="filled" severity="warning">
-                Não foi encontrada nenhuma linha.
+                Nenhuma linha foi apagada.
               </Alert>
             ) : (
-              <ResponseTable data={data} />
+              <Alert variant="filled" severity="success">
+                {
+                  data.length === 1
+                    ? `1 linha foi apagada na tabela ${responseTable}.` :
+                    `${data.length} linhas foram apagadas na tabela ${responseTable}.`
+                }
+              </Alert>
             )
           )
         }
+        {data && data.length > 0 && <ResponseTable data={data} />}
       </Paper>
     </Box>
   );
-
-  function handleTableChange(e: SelectChangeEvent<TTables>) {
-    setTable(e.target.value);
-    if (e.target.value === 'ProdutoDesconto') {
-      setCanJoin(false);
-    }
-  }
 
   async function handleQuerySubmit() {
     try {
@@ -139,13 +91,9 @@ export default function SelectPage() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          sql: createSelectQuery({
-            select,
-            from: table,
-            fromAlias: tableAlias,
+          sql: createDeleteQuery({
+            fromTable: table,
             where,
-            join: canJoin,
-            joinAlias
           })
         })
       });
@@ -157,6 +105,7 @@ export default function SelectPage() {
         setError(data.error);
       } else {
         setData(data);
+        setResponseTable(table);
         setError(null);
       }
     } catch (e) {
