@@ -14,6 +14,5 @@ export function ConnectToDbAndReturnPoll()
         port: process.env.DB_PORT,
         options: `-c search_path=ecommerce,public`
     })
-
     return pool
 }
